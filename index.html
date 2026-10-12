@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carpe Diem Setagaya 試合スケジュール</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#1d2330;--sub:#6b7280;--acc:#d6262f}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{position:sticky;top:0;z-index:10;background:#1d2330;color:#fff;padding:10px 14px}
+header h1{font-size:16px;margin:0}header .sub{font-size:12px;opacity:.8}
+#clock{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+nav{display:flex;gap:4px;overflow-x:auto;margin-top:8px}nav button{flex:1;white-space:nowrap;border:0;border-radius:8px;padding:8px 10px;background:#39404f;color:#fff;font-size:14px}
+nav button.on{background:var(--acc)}
+main{padding:12px;max-width:900px;margin:auto}section{display:none}section.on{display:block}
+.note{background:#fff7e0;border-left:4px solid #f0b400;padding:8px 10px;border-radius:6px;font-size:13px;margin-bottom:12px}
+.next{background:#fff;border:3px solid var(--acc);border-radius:12px;padding:10px;margin-bottom:12px}
+.m{display:flex;gap:10px;align-items:center;background:var(--card);border-radius:10px;padding:8px 10px;margin:6px 0;box-shadow:0 1px 2px #0001}
+.m.past{opacity:.4;filter:grayscale(1)}.m.nx{outline:3px solid var(--acc);background:#fff1f1}
+.mat{min-width:52px;height:52px;border-radius:10px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:24px;line-height:1}
+.mat small{font-size:10px;font-weight:600}
+.mat1{background:#e53935}.mat4{background:#1e88e5}.mat5{background:#43a047}.mat6{background:#8e24aa}.mat7{background:#fb8c00}.matx{background:#555}
+.tm{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;min-width:56px}
+.info{flex:1;min-width:0}.info .c{font-size:12px;color:var(--sub)}.info .v{font-size:14px}
+.own{color:var(--acc);font-weight:700}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:middle}
+.t-own{background:var(--acc);color:#fff}.t-sc{background:#455a64;color:#fff}.t-est{background:#f0b400;color:#000}.t-done{background:#999;color:#fff}
+.card{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:12px;box-shadow:0 1px 3px #0002}
+.card h3{margin:0 0 4px;font-size:17px}.card h4{margin:10px 0 2px;font-size:13px;color:var(--sub)}
+.card .m{box-shadow:none;background:#f6f7f9}
+.filters{background:#fff;border-radius:10px;padding:8px;margin-bottom:8px}
+.filters .row{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}.chip{border:1px solid #ccc;background:#fff;border-radius:16px;padding:5px 10px;font-size:13px}
+.chip.on{background:#1d2330;color:#fff;border-color:#1d2330}
+details{background:#fff;border-radius:10px;margin-bottom:8px;padding:6px 10px}summary{font-weight:700;padding:6px 0;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid #eee;padding:5px 4px;text-align:left;vertical-align:top}
+tr.ownrow{background:#fff1f1}
+.lost{color:var(--sub)}
+</style></head><body>
+<header><div class="top"><div><h1>Carpe Diem Setagaya</h1><div class="sub">SJJJF 9th All Japan Jiu Jitsu Championship（ASJJF #1872）</div></div><div id="clock">--:--</div></div>
+<nav><button data-s="tl" class="on">タイムライン</button><button data-s="fc">選手別</button><button data-s="ms">マット表</button><button data-s="br">トーナメント</button><button data-s="d1">10/11結果</button></nav></header>
+<main>
+<div class="note">⚠ 時刻はすべて日本時間（JST）。表示時刻はサイト掲載の予定で、当日は前後にずれることがあります。会場の呼び出しを優先してください。<span class="tag t-est">推定</span>は対戦表の並びからの推測です。データ取得：2026/10/12 午前。</div>
+<section id="tl" class="on"><div id="nextbox"></div><div id="tlist"></div></section>
+<section id="fc"></section>
+<section id="ms"><div class="filters">
+<div class="row" id="fType"></div><div class="row" id="fFighter"></div><div class="row" id="fMat"></div></div><div id="mlist"></div></section>
+<section id="br"></section>
+<section id="d1"></section>
+</main>
+<script>
+const ROWS=[{"cat": "Male White Adult 18 Rooster", "no": 46, "rd": "R1", "a": "Shimizu Haru (Carpe Diem Setagaya)", "b": "Kito Ryoma (Sora Bjj)", "day": 11, "time": "16:14", "mat": 5}, {"cat": "Male White Adult 18 Rooster", "no": 47, "rd": "R1", "a": "Kishinami Tensei (Carpe Diem Machida)", "b": "Kanzaki Youhei (Ueno Okachimachi Bjj)", "day": 11, "time": "16:22", "mat": 5}, {"cat": "Male White Adult 18 Rooster", "no": 48, "rd": "R1", "a": "Toda Shou (Neo Judo Academy)", "b": "Furukawa Ryo (Paraestra Koiwa)", "day": 11, "time": "16:29", "mat": 5}, {"cat": "Male White Adult 18 Rooster", "no": 50, "rd": "SF", "a": "Kito Ryoma (Sora Bjj)", "b": "Toda Shou (Neo Judo Academy)", "day": 11, "time": "16:46", "mat": 5}, {"cat": "Male White Adult 18 Rooster", "no": 51, "rd": "SF", "a": "Kanzaki Youhei (Ueno Okachimachi Bjj)", "b": "Ishikawa Ken (Bonsai Jiu-jitsu Japan; bye in R1)", "day": 11, "time": "16:47", "mat": 5}, {"cat": "Male White Adult 18 Rooster", "no": 62, "rd": "F", "a": "Toda Shou (Neo Judo Academy)", "b": "Kanzaki Youhei (Ueno Okachimachi Bjj)", "day": 11, "time": "17:58", "mat": 5}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 18, "rd": "R1", "a": "Kimura Aren (Jump Fight Club)", "b": "Nishimura Misaki (Tatoru)", "day": 11, "time": "13:21", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 26, "rd": "R1", "a": "Takamoto Tetsuji (Takamoto Dojo)", "b": "Yanaka Tatsuya (The Blackbelt Japan)", "day": 11, "time": "13:59", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 27, "rd": "R1", "a": "Nakao Masahiro (Other)", "b": "Suzuki Teppei (Tri-force Yachiyo)", "day": 11, "time": "14:46", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 29, "rd": "R2", "a": "Takamoto Tetsuji (Takamoto Dojo)", "b": "Takeda Kakeru (Fuji Jiujitsu; bye in R1)", "day": 11, "time": "14:22", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 38, "rd": "R2", "a": "Kimura Aren (Jump Fight Club)", "b": "Suzuki Teppei (Tri-force Yachiyo)", "day": 11, "time": "14:56", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 41, "rd": "F", "a": "Suzuki Teppei (Tri-force Yachiyo)", "b": "Takamoto Tetsuji (Takamoto Dojo)", "day": 11, "time": "15:12", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (A)", "no": 44, "rd": "extra (3rd place?)", "a": "Takamoto Tetsuji? (uncertain)", "b": "Nishimura Misaki? (uncertain)", "day": 11, "time": "15:37", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (B)", "no": 23, "rd": "R1", "a": "Takanashi Junya (Hide Out Bjj)", "b": "Murai Rintaro (Carpe Diem Machida)", "day": 11, "time": "13:40", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (B)", "no": 24, "rd": "R1", "a": "Kimura Jun (Carpe Diem Setagaya)", "b": "Nigo Takeru (Tri-force Kawagoe)", "day": 11, "time": "13:48", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (B)", "no": 25, "rd": "R1", "a": "Higuchi Mizuho (Kijiukai)", "b": "Takeshita Kaito (Carpe Diem Kumamoto)", "day": 11, "time": "13:51", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (B)", "no": 28, "rd": "R2", "a": "Nigo Takeru (Tri-force Kawagoe)", "b": "Ishikawa Suguru (Carpe Diem Kawasaki; bye in R1)", "day": 11, "time": "14:03", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (B)", "no": 30, "rd": "R2", "a": "Murai Rintaro (Carpe Diem Machida)", "b": "Takeshita Kaito (Carpe Diem Kumamoto)", "day": 11, "time": "14:14", "mat": 6}, {"cat": "Male Blue Adult 18 Feather (B)", "no": 37, "rd": "F", "a": "Takeshita Kaito (Carpe Diem Kumamoto)", "b": "Nigo Takeru (Tri-force Kawagoe)", "day": 11, "time": "14:49", "mat": 6}, {"cat": "Male White Master 30 Ultra Heavy", "no": 9, "rd": "F", "a": "Abe Kohei (Strapple Setagaya Jiyugaoka)", "b": "Kouki Tsuchiya (Back To Back Brazilian Jiu-Jitsu)", "day": 12, "time": "10:18", "mat": 4}, {"cat": "Male White Master 30 Open Weight", "no": 52, "rd": "R1", "a": "Kouki Tsuchiya (Back To Back Brazilian Jiu-Jitsu)", "b": "Namioka Akio (Life Jiu Jitsu Academy)", "day": 12, "time": "15:07", "mat": 4}, {"cat": "Male White Master 30 Open Weight", "no": 53, "rd": "R1", "a": "Abe Kohei (Strapple Setagaya Jiyugaoka)", "b": "Bruno Yuichi (Tri-force Gotanda)", "day": 12, "time": "15:13", "mat": 4}, {"cat": "Male White Master 30 Open Weight", "no": 57, "rd": "F", "a": "TBD (winner 52)", "b": "TBD (winner 53)", "day": 12, "time": "15:37", "mat": 4}, {"cat": "Male Purple Master 30 Open Weight", "no": 3, "rd": "F?", "a": "Morioka Yoshiaki (Strapple Setagaya Jiyugaoka)", "b": "TBD (no opponent shown)", "day": 12, "time": "09:30", "mat": 7}, {"cat": "Male Purple Master 36 Open Weight", "no": 49, "rd": "R1", "a": "Miki Yoshiyasu (Yawara)", "b": "Shimamoto Keizo (Axis Chiba)", "day": 12, "time": "14:42", "mat": 5}, {"cat": "Male Purple Master 36 Open Weight", "no": 52, "rd": "R1", "a": "Inoue Tomohiro (Carpe Diem Setagaya)", "b": "TBD", "day": 12, "time": "15:00", "mat": 5}, {"cat": "Male Purple Master 36 Open Weight", "no": 55, "rd": "F", "a": "TBD", "b": "TBD", "day": 12, "time": "15:18", "mat": 5}, {"cat": "Male Blue Master 41 Rooster", "no": 57, "rd": "F", "a": "Anzai Masahito (Ambitious Jiu Jitsu)", "b": "Kamada Gaku (Carpe Diem Setagaya)", "day": 12, "time": "15:30", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 42, "rd": "R1", "a": "Hirata Shoji (Carpe Diem Setagaya)", "b": "Ninomiya Yukihiro (Strapple Setagaya Jiyugaoka)", "day": 12, "time": "14:00", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 45, "rd": "R1", "a": "Kasuga Kenji (Cave)", "b": "Tsuchiya Masaaki (Shrapnel Jiu-jitsu Academy)", "day": 12, "time": "14:18", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 46, "rd": "R1", "a": "Harayama Yohei (Axis Ichinomiya)", "b": "Yamase Kazuhiro (Ueno Okachimachi Bjj)", "day": 12, "time": "14:24", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 47, "rd": "R1", "a": "Nozawa Ryota (Trydent Gym)", "b": "Oya Takeshi (Carpediem Shibuya)", "day": 12, "time": "14:30", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 48, "rd": "SF", "a": "TBD", "b": "TBD", "day": 12, "time": "14:36", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 50, "rd": "SF", "a": "TBD", "b": "TBD", "day": 12, "time": "14:48", "mat": 5}, {"cat": "Male Blue Master 46 Feather", "no": 53, "rd": "F", "a": "TBD", "b": "TBD", "day": 12, "time": "15:06", "mat": 5}, {"cat": "Male Purple Master 46 Feather", "no": 19, "rd": "R1", "a": "Matsuda Sadatoshi (Cave)", "b": "Abe Hidenori (Tri-force Ojima)", "day": 12, "time": "11:18", "mat": 4}, {"cat": "Male Purple Master 46 Feather", "no": 26, "rd": "SF", "a": "TBD (winner 19)", "b": "Yoneda Yasuho (Carpe Diem Setagaya)", "day": 12, "time": "12:02", "mat": 4}, {"cat": "Male Purple Master 46 Feather", "no": 27, "rd": "SF", "a": "Miyazaki Gen (Axis)", "b": "Tsuda Tomohiro (Strapple Ibaraki)", "day": 12, "time": "12:08", "mat": 4}, {"cat": "Male Purple Master 46 Feather", "no": 33, "rd": "F", "a": "TBD", "b": "TBD", "day": 12, "time": "12:45", "mat": 4}, {"cat": "Male Blue Master 51 Light Feather", "no": 7, "rd": "R1", "a": "Hashiba Tsuyoshi (Carpe Diem Setagaya)", "b": "Hamaguchi Teruyoshi (Wajutsu Keisyukai Hearts)", "day": 12, "time": "10:02", "mat": 1}, {"cat": "Male Blue Master 51 Light Feather", "no": 10, "rd": "R1", "a": "Kumazawa Shigeki (Rodeo Style Gym)", "b": "Yamanaka Shigeki (Shrapnel Jiu-jitsu Academy)", "day": 12, "time": "10:36", "mat": 1}, {"cat": "Male Blue Master 51 Light Feather", "no": 17, "rd": "F", "a": "Hamaguchi Teruyoshi (Wajutsu Keisyukai Hearts)", "b": "TBD", "day": 12, "time": "11:18", "mat": 1}, {"cat": "Male Blue Master 51 Feather", "no": 16, "rd": "R1", "a": "Akamine Teruaki (Yanagisawa Jiu-jitsu)", "b": "Hatao Tatsuhiro (Ablaze Hachioji)", "day": 12, "time": "11:12", "mat": 1}, {"cat": "Male Blue Master 51 Feather", "no": 24, "rd": "SF", "a": "TBD (winner 16)", "b": "Hamamoto Yasuo (Toikatsu Grappling Higa..)", "day": 12, "time": "12:00", "mat": 1}, {"cat": "Male Blue Master 51 Feather", "no": 25, "rd": "SF", "a": "Kishi Yukihiro (Lotus Setagaya)", "b": "Wada Daiga (Carpe Diem Setagaya)", "day": 12, "time": "12:06", "mat": 1}, {"cat": "Male Blue Master 51 Feather", "no": 29, "rd": "F", "a": "TBD", "b": "TBD", "day": 12, "time": "12:30", "mat": 1}];
+const DAY=12;
+const FIGHTERS=[
+ {k:"Hashiba Tsuyoshi",jp:"羽柴 Tsuyoshi",cat:"Male Blue Master 51 Light Feather",own:[[7],[17,"推定（決勝欄にHamaguchiの名前が表示済み＝1回戦敗退の可能性あり）"]],sc:[10]},
+ {k:"Yoneda Yasuho",jp:"米田 Yasuho",cat:"Male Purple Master 46 Feather",own:[[26],[33,"推定（準決勝に勝てば）"]],sc:[19,27]},
+ {k:"Wada Daiga",jp:"和田 Daiga",cat:"Male Blue Master 51 Feather",own:[[25],[29,"推定（準決勝に勝てば）"]],sc:[16,24]},
+ {k:"Hirata Shoji",jp:"平田 Shoji",cat:"Male Blue Master 46 Feather",own:[[42],[48,"推定（1回戦に勝てば・相手はおそらく#45の勝者）"],[53,"推定（決勝・相手は#46/#47/#50の勝ち上がり）"]],sc:[45,46,47,50]},
+ {k:"Inoue Tomohiro",jp:"井上 Tomohiro",cat:"Male Purple Master 36 Open Weight",own:[[52,"相手未定"],[55,"推定（相手はおそらく#49の勝者）"]],sc:[49]},
+ {k:"Kamada Gaku",jp:"鎌田 Gaku",cat:"Male Blue Master 41 Rooster",own:[[57]],sc:[]},
+];
+const D11=[{jp:"清水 Haru",k:"Shimizu Haru",cat:"Male White Adult 18 Rooster",no:46},{jp:"木村 Jun",k:"Kimura Jun",cat:"Male Blue Adult 18 Feather (B)",no:24}];
+const find=(c,n)=>ROWS.find(r=>r.cat===c&&r.no===n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const catJ=c=>c.replace("Male ","男子 ").replace("White","白帯").replace("Blue","青帯").replace("Purple","紫帯").replace("Master","マスター").replace("Adult","アダルト").replace("Open Weight","オープン");
+const rdJ=r=>({R1:"1回戦",R2:"2回戦",SF:"準決勝",F:"決勝"}[r]||r);
+// build event list
+const EV=[];
+FIGHTERS.forEach(f=>{
+ f.own.forEach(([n,est])=>{const r=find(f.cat,n);if(r)EV.push({type:"own",f,r,est:est||""});});
+ f.sc.forEach(n=>{const r=find(f.cat,n);if(r)EV.push({type:"sc",f,r,est:""});});
+});
+const mins=t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
+EV.forEach(e=>e.t=mins(e.r.time));EV.sort((a,b)=>a.t-b.t||a.r.mat-b.r.mat);
+function nowMin(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
+ const day=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+ if(day<20261012)return -1; if(day>20261012)return 99999; return d.getHours()*60+d.getMinutes();}
+const hl=s=>esc(s).replace(/([^|]*Carpe Diem Setagaya[^)]*\))/g,'<span class="own">$1</span>');
+function matB(m){return `<div class="mat mat${[1,4,5,6,7].includes(m)?m:'x'}"><small>MAT</small>${m}</div>`}
+function item(e,cls,showF=true){const r=e.r;
+ const tags=(e.type=="own"?'<span class="tag t-own">出場</span>':'<span class="tag t-sc">偵察</span>')+(e.est?'<span class="tag t-est">推定</span>':'');
+ return `<div class="m ${cls}" data-t="${e.t}">${matB(r.mat)}<div class="tm">${r.time}</div><div class="info">
+ <div class="c">#${r.no} ${rdJ(r.rd)}・${esc(catJ(r.cat))}${tags}</div>
+ ${showF?`<div class="c">${e.type=="own"?"選手：":"偵察対象 → "}<b>${esc(e.f.jp)}</b>${e.type=="sc"?" の対戦相手候補":""}</div>`:""}
+ <div class="v">${hl(r.a)}<br>vs ${hl(r.b)}</div>${e.est?`<div class="c">${esc(e.est)}</div>`:""}</div></div>`}
+function stateCls(e,now,nextT){return e.t+8<=now?"past":(e.t===nextT?"nx":"")}
+// filters
+const FS={type:new Set(["own","sc"]),fighter:"all",mat:"all"};
+function chips(id,opts,get,set){const el=document.getElementById(id);el.innerHTML=opts.map(([v,l])=>`<button class="chip" data-v="${v}">${l}</button>`).join("");
+ el.onclick=ev=>{const b=ev.target.closest("button");if(!b)return;set(b.dataset.v);render();};el._get=get;}
+chips("fType",[["own","出場試合"],["sc","偵察試合"]],v=>FS.type.has(v),v=>{FS.type.has(v)?FS.type.delete(v):FS.type.add(v)});
+chips("fFighter",[["all","全選手"],...FIGHTERS.map(f=>[f.k,f.jp])],v=>FS.fighter===v,v=>FS.fighter=v);
+chips("fMat",[["all","全マット"],...[...new Set(EV.map(e=>e.r.mat))].sort().map(m=>[m,"マット"+m])],v=>FS.mat==v,v=>FS.mat=v);
+function render(){const now=nowMin();
+ document.querySelectorAll(".filters .row").forEach(r=>r.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",r._get(c.dataset.v))));
+ const own=EV.filter(e=>e.type=="own");const nxO=own.find(e=>e.t+8>now);
+ document.getElementById("nextbox").innerHTML=nxO?`<div class="next"><b>▶ 次の出場試合</b>${item(nxO,"")}</div>`:`<div class="next">本日の出場試合はすべて終了予定時刻を過ぎました</div>`;
+ document.getElementById("tlist").innerHTML=own.map(e=>item(e,stateCls(e,now,nxO&&nxO.t))).join("");
+ const fl=EV.filter(e=>FS.type.has(e.type)&&(FS.fighter=="all"||e.f.k==FS.fighter)&&(FS.mat=="all"||e.r.mat==FS.mat));
+ const nxF=fl.find(e=>e.t+8>now);
+ document.getElementById("mlist").innerHTML=fl.length?fl.map(e=>item(e,stateCls(e,now,nxF&&nxF.t))).join(""):'<p>該当なし</p>';
+ document.getElementById("fc").innerHTML=FIGHTERS.map(f=>{const o=EV.filter(e=>e.f===f&&e.type=="own"),s=EV.filter(e=>e.f===f&&e.type=="sc");
+  const nx=EV.filter(e=>e.f===f).find(e=>e.t+8>now);
+  return `<div class="card"><h3>${esc(f.jp)} <span class="c" style="font-size:12px;color:#6b7280">${esc(catJ(f.cat))}</span></h3>
+  <h4>出場試合</h4>${o.map(e=>item(e,stateCls(e,now,nx&&nx.t),false)).join("")}
+  <h4>偵察（対戦相手候補の試合）</h4>${s.length?s.map(e=>item(e,stateCls(e,now,nx&&nx.t),false)).join(""):'<p class="c">対戦相手（Anzai選手）にほかの試合がないため偵察できる試合はありません。</p>'}</div>`}).join("")
+  +`<div class="card"><h3>10/11 試合済み</h3>${D11.map(d=>`<div class="lost">${esc(d.jp)}：1回戦敗退</div>`).join("")}</div>`;
+}
+// brackets (static)
+const cats=[...new Set(ROWS.map(r=>r.cat))];
+document.getElementById("br").innerHTML=cats.map(c=>{const rs=ROWS.filter(r=>r.cat===c).sort((a,b)=>a.no-b.no);const ownC=rs.some(r=>(r.a+r.b).includes("Carpe Diem Setagaya"));
+ return `<details ${ownC&&rs[0].day==DAY?"open":""}><summary>${ownC?"★ ":""}${esc(catJ(c))}（${rs[0].day}日・${rs.length}試合）</summary><table><tr><th>#</th><th>回戦</th><th>時間</th><th>マット</th><th>対戦</th></tr>
+ ${rs.map(r=>`<tr class="${(r.a+r.b).includes("Carpe Diem Setagaya")?"ownrow":""}"><td>${r.no}</td><td>${rdJ(r.rd)}</td><td>${r.day}日 ${r.time}</td><td>${r.mat}</td><td>${hl(r.a)}<br>vs ${hl(r.b)}</td></tr>`).join("")}</table></details>`}).join("")
+ +'<p class="c" style="font-size:12px;color:#6b7280">TBD＝前の試合の勝者（未確定）。★＝Carpe Diem Setagaya出場カテゴリー。</p>';
+document.getElementById("d1").innerHTML=`<div class="card"><h3>10/11（日）の結果</h3>${D11.map(d=>{const r=find(d.cat,d.no);return `<h4>${esc(d.jp)}・${esc(catJ(d.cat))}</h4><div class="m past" style="opacity:.8">${matB(r.mat)}<div class="tm">${r.time}</div><div class="info"><div class="c">#${r.no} ${rdJ(r.rd)} <span class="tag t-done">1回戦敗退</span></div><div class="v">${hl(r.a)}<br>vs ${hl(r.b)}</div></div></div>`}).join("")}</div>`;
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,section").forEach(x=>x.classList.remove("on"));b.classList.add("on");document.getElementById(b.dataset.s).classList.add("on");scrollTo(0,0)});
+function tick(){document.getElementById("clock").textContent=new Date().toLocaleTimeString("ja-JP",{timeZone:"Asia/Tokyo",hour:"2-digit",minute:"2-digit",second:"2-digit"})}
+let lastM=-2;setInterval(()=>{tick();const n=nowMin();if(n!==lastM){lastM=n;render()}},1000);tick();render();
+</script></body></html>
